@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdio.h>
 
 #include "bbb_dht_read.h"
 #include "bbb_mmio.h"
@@ -42,10 +43,13 @@ int dht_read(char *pin, int type, float *humidity, float *temperature)
 	int base;
 	int num;
 
-	if (pin_to_gpio(pin, &base, &num) == 1) {
+	if (pin_to_gpio(pin, &base, &num) > 0) {
 		return bbb_dht_read(type, base, num, humidity, temperature);
 	}
-	return DHT_ERROR_ARGUMENT;
+	else {
+		fprintf(stderr, "%s: pin_to_gpio returned an error\n", __FUNCTION__);
+		return DHT_ERROR_ARGUMENT;
+	}
 }
 
 int bbb_dht_read(int type, int gpio_base, int gpio_number, float* humidity, float* temperature) {

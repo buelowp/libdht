@@ -108,7 +108,7 @@ common_dht_read.o: common_dht_read.c common_dht_read.h
 
 install:   FORCE
 	install -m 0775 $(TARGET) $(DESTDIR)/usr/lib
-	install -m 0644 bbb_dht_read.h $(DESTDIR)/usr/include
+	install -m 0644 bbb_dht_read.h common_dht_read.h $(DESTDIR)/usr/include
 
 uninstall:   FORCE
 

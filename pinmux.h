@@ -2,10 +2,22 @@
 #define __PINMUX_H__
 
 #include <string.h>
+#include <stdio.h>
 
-int pin_to_gpio(char *str, char *a, char *b)
+int pin_to_gpio(char *str, int *a, int *b)
 {
-	if (!str || !a || !b) {
+	if (!str) {
+		fprintf(stderr, "%s: str is NULL\n", __FUNCTION__);
+		return -1;
+	}
+
+	if (!a) {
+		fprintf(stderr, "%s: a is NULL\n", __FUNCTION__);
+		return -1;
+	}
+
+	if (!b) {
+		fprintf(stderr, "%s: b is NULL\n", __FUNCTION__);
 		return -1;
 	}
 
@@ -834,6 +846,7 @@ int pin_to_gpio(char *str, char *a, char *b)
 		*b = 7;
 		return 165;
 	}
+	fprintf(stderr, "%s: No value found for %s\n", __FUNCTION__, str);
 	return -1;
 }
 

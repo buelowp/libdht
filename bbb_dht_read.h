@@ -28,6 +28,13 @@
 // If a successfull reading could be made a value of 0 (DHT_SUCCESS) will be returned.  If there
 // was an error reading the sensor a negative value will be returned.  Some errors can be ignored
 // and retried, specifically DHT_ERROR_TIMEOUT or DHT_ERROR_CHECKSUM.
+#ifdef __cplusplus
+extern "C" {
+#endif
 int bbb_dht_read(int type, int gpio_base, int gpio_number, float* humidity, float* temperature);
+int dht_read(char *pin, int type, float *humidity, float *temperature);
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* BBB_DHT_READ_H_ */
