@@ -24,6 +24,7 @@
 
 #include "bbb_dht_read.h"
 #include "bbb_mmio.h"
+#include "pinmux.h"
 
 // This is the only processor specific magic value, the maximum amount of time to
 // spin in a loop before bailing out and considering the read a timeout.  This should
@@ -35,6 +36,17 @@
 // the first pulse is a constant 50 microsecond pulse, with 40 pulses to represent
 // the data afterwards.
 #define DHT_PULSES 41
+
+int dht_read(char *pin, int type, float *humidity, float *temperature)
+{
+	int base;
+	int num;
+
+	if (pin_to_gpio(pin, &base, &num) == 1) {
+		return bbb_dht_read(type, base, num, humidity, temperature);
+	}
+	return DHT_ERROR_ARGUMENT;
+}
 
 int bbb_dht_read(int type, int gpio_base, int gpio_number, float* humidity, float* temperature) {
   // Validate humidity and temperature arguments and set them to zero.

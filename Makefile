@@ -43,10 +43,6 @@ QMAKE_TARGET  = dht22
 DESTDIR       = 
 TARGET        = libdht22.so
 TARGETA       = libdht22.a
-TARGETD       = libdht22.so.1.0.0
-TARGET0       = libdht22.so
-TARGET1       = libdht22.so.1
-TARGET2       = libdht22.so.1.0
 
 first: all
 ####### Implicit rules
@@ -111,6 +107,8 @@ common_dht_read.o: common_dht_read.c common_dht_read.h
 ####### Install
 
 install:   FORCE
+	install -m 0775 $(TARGET) $(DESTDIR)/usr/lib
+	install -m 0644 bbb_dht_read.h $(DESTDIR)/usr/include
 
 uninstall:   FORCE
 
