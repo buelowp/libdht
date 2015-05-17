@@ -70,7 +70,6 @@ void run_daemon(char *pin, int type)
     		values->humidity = humidity;
     		values->temperature = temperature;
     		values->mutex = MUTEX_VALID;
-    		memcpy(addr, values, sizeof(dht22));
     		sleep(3);
     	}
     	else {
