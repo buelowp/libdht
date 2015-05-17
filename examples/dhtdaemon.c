@@ -45,11 +45,8 @@ void run_daemon(char *pin, int type)
     int shmid;
     int rval;
     dht22 *values;
-    char *addr;
     float humidity = 0.0;
     float temperature = 0.0;
-
-    memset(&values, 0, sizeof(dht22));
 
     openlog("dhtdaemon", LOG_ODELAY, LOG_USER);
 
@@ -60,11 +57,13 @@ void run_daemon(char *pin, int type)
 
     ftruncate(shmid, sizeof(dht22));
 
-    if ((addr = mmap (0, sizeof(dht22), PROT_WRITE, MAP_SHARED, shmid, 0)) == MAP_FAILED) {
+    if ((values = (dht22*)mmap (0, sizeof(dht22), PROT_WRITE, MAP_SHARED, shmid, 0)) == MAP_FAILED) {
     	syslog(LOG_ERR, "Daemon exiting: %s(%d)", strerror(errno), errno);
     	closelog();
     	exit(-1);
     }
+
+    memset(values, 0, sizeof(dht22));
 
     while (1) {
     	if ((rval = dht_read(pin, type, &humidity, &temperature)) == DHT_SUCCESS) {
