@@ -36,16 +36,27 @@ int dht_read(char *pin, int type, float *humidity, float *temperature);
 #endif
 
 // Define errors and return values.
-#define DHT_ERROR_TIMEOUT -1
-#define DHT_ERROR_CHECKSUM -2
-#define DHT_ERROR_ARGUMENT -3
-#define DHT_ERROR_GPIO -4
-#define DHT_SUCCESS 0
+#define DHT_ERROR_TIMEOUT 	-1
+#define DHT_ERROR_CHECKSUM 	-2
+#define DHT_ERROR_ARGUMENT 	-3
+#define DHT_ERROR_GPIO 		-4
+#define DHT_SUCCESS 		0
 
 // Define sensor types.
-#define DHT11 11
-#define DHT22 22
-#define AM2302 22
+#define DHT11 				11
+#define DHT22 				22
+#define AM2302 				22
+
+#define DHT_MEM_SEGMENT		"dhtdaemon"
+
+#define MUTEX_VALID			47
+#define MUTEX_INVALID 		-1
+
+typedef struct {
+	int mutex;
+	float humidity;
+	float temperature;
+} dht22;
 
 // Not public, so don't extern C them
 

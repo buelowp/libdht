@@ -55,7 +55,7 @@ void run_daemon(char *pin, int type)
 
     openlog("dhtdaemon", LOG_ODELAY, LOG_USER);
 
-    if ((shmid = shm_open("dhtdaemon", O_CREAT | O_RDWR, 0666)) < 0) {
+    if ((shmid = shm_open(DHT_MEM_SEGMENT, O_CREAT | O_RDWR, 0666)) < 0) {
     	syslog(LOG_ERR, "Daemon exiting: %s(%d)", strerror(errno), errno);
     	exit(-1);
     }
