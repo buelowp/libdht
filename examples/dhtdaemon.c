@@ -29,8 +29,6 @@
 #include <syslog.h>
 #include <errno.h>
 
-#include "dhtdaemon.h"
-
 #include "../library/bbb_dht.h"
 
 /**
