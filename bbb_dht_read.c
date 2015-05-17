@@ -25,7 +25,7 @@
 
 #include "bbb_dht_read.h"
 #include "bbb_mmio.h"
-#include "pinmux.h"
+#include "library/pinmux.h"
 
 // This is the only processor specific magic value, the maximum amount of time to
 // spin in a loop before bailing out and considering the read a timeout.  This should
