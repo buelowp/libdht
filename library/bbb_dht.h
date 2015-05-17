@@ -21,8 +21,6 @@
 #ifndef BBB_DHT_READ_H
 #define BBB_DHT_READ_H
 
-#include "common_dht_read.h"
-
 // Read DHT sensor connected to GPIO bin GPIO<base>_<number>, for example P8_11 is GPIO1_13 with
 // base = 1 and number = 13.  Humidity and temperature will be returned in the provided parameters.
 // If a successfull reading could be made a value of 0 (DHT_SUCCESS) will be returned.  If there
@@ -37,4 +35,19 @@ int dht_read(char *pin, int type, float *humidity, float *temperature);
 }
 #endif
 
+// Define errors and return values.
+#define DHT_ERROR_TIMEOUT -1
+#define DHT_ERROR_CHECKSUM -2
+#define DHT_ERROR_ARGUMENT -3
+#define DHT_ERROR_GPIO -4
+#define DHT_SUCCESS 0
+
+// Define sensor types.
+#define DHT11 11
+#define DHT22 22
+#define AM2302 22
+
+// Not public, so don't extern C them
+
+// Busy wait delay for most accurate timing, but high CPU usage.
 #endif /* BBB_DHT_READ_H_ */

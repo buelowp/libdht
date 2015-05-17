@@ -12,8 +12,9 @@
 #include <sys/types.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
-#include <bbb_dht_read.h>
 #include "dhtdaemon.h"
+
+#include "../library/bbb_dht.h"
 
 int run_daemon(char *pin, int type)
 {
