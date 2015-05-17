@@ -23,36 +23,49 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/shm.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <syslog.h>
+#include <errno.h>
+
 #include "dhtdaemon.h"
 
 #include "../library/bbb_dht.h"
 
-int run_daemon(char *pin, int type)
+/**
+ * \func int run_daemon(char *pin, int type)
+ * \param pin BBB Pin to attach to
+ * \param type Is this an 11 or 22
+ * \returns No return
+ * Loop forever reading values from the sensor and
+ * store them to the shared memory area. Anyone can
+ * read them.
+ */
+void run_daemon(char *pin, int type)
 {
     int shmid;
     int rval;
     dht22 *values;
+    char *addr;
     float humidity = 0.0;
     float temperature = 0.0;
 
     memset(&values, 0, sizeof(dht22));
 
-    /*
-     * Create the segment.
-     */
-    if ((shmid = shmget(DHT22_KEY, sizeof(dht22), IPC_CREAT | 0666)) < 0) {
-        perror("shmget");
-        exit(1);
+    openlog("dhtdaemon", LOG_ODELAY, LOG_USER);
+
+    if ((shmid = shm_open("dhtdaemon", O_CREAT | O_RDWR, 0666)) < 0) {
+    	syslog(LOG_ERR, "Daemon exiting: %s(%d)", strerror(errno), errno);
+    	exit(-1);
     }
 
-    /*
-     * Now we attach the segment to our data space.
-     */
-    if ((values = shmat(shmid, NULL, 0)) == (void*) -1) {
-        perror("shmat");
-        exit(1);
+    ftruncate(shmid, sizeof(dht22));
+
+    if ((addr = mmap (0, sizeof(dht22), PROT_WRITE, MAP_SHARED, shmid, 0)) == MAP_FAILED) {
+    	syslog(LOG_ERR, "Daemon exiting: %s(%d)", strerror(errno), errno);
+    	closelog();
+    	exit(-1);
     }
 
     while (1) {
@@ -60,11 +73,10 @@ int run_daemon(char *pin, int type)
     		values->humidity = humidity;
     		values->temperature = temperature;
     		values->mutex = MUTEX_VALID;
-    		fprintf(stdout, "%s: humidity=%f, temperature=%f\n", __FUNCTION__, humidity, temperature);
+    		memcpy(addr, values, sizeof(dht22));
     		sleep(3);
     	}
     	else {
-    		fprintf(stderr, "%s: dht_read returned %d\n", __FUNCTION__, rval);
     		sleep(1);
     	}
     }
@@ -72,6 +84,8 @@ int run_daemon(char *pin, int type)
 
 int main(int argc, char *argv[])
 {
+    pid_t pid;
+
 	if (argc != 3) {
 		fprintf(stderr, "usage: %s <gpio pin> <sensor type>\n", argv[0]);
 		fprintf(stderr, "where <gpio pin> is something like P9_12\n");
@@ -79,6 +93,23 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	run_daemon(argv[1], atoi(argv[2]));
-	return 0;
+	/* Fork off the parent process */
+    pid = fork();
+    if (pid < 0) {
+    	perror("fork");
+    	return -1;
+    }
+    else {
+    	fclose(stderr);
+    	fclose(stdout);
+    	fclose(stdin);
+    	run_daemon(argv[1], atoi(argv[2]));
+    }
+    /* If we got a good PID, then
+       we can exit the parent process. */
+    if (pid > 0) {
+            exit(EXIT_SUCCESS);
+    }
+
+    return 0;
 }

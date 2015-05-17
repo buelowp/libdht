@@ -21,9 +21,9 @@
 #ifndef EXAMPLES_DHTDAEMON_H_
 #define EXAMPLES_DHTDAEMON_H_
 
-#define DHT22_KEY	4567
-#define MUTEX_VALID	1
-#define MUTEX_INVALID -1
+#define DHT22_KEY		4567
+#define MUTEX_VALID		47
+#define MUTEX_INVALID 	-1
 
 typedef struct {
 	int mutex;
