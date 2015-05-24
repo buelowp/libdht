@@ -28,6 +28,7 @@
 #include <fcntl.h>
 #include <syslog.h>
 #include <errno.h>
+#include <signal.h>
 
 #include "../library/bbb_dht.h"
 
@@ -50,14 +51,14 @@ void run_daemon(char *pin, int type)
 
     openlog("dhtdaemon", LOG_ODELAY, LOG_USER);
 
-    if ((shmid = shm_open(DHT_MEM_SEGMENT, O_CREAT | O_RDWR, 0666)) < 0) {
+    if ((shmid = shm_open(DHT_MEM_SEGMENT, O_CREAT|O_RDWR, 0666)) < 0) {
     	syslog(LOG_ERR, "Daemon exiting: %s(%d)", strerror(errno), errno);
     	exit(-1);
     }
 
     ftruncate(shmid, sizeof(dht22));
 
-    if ((values = (dht22*)mmap (0, sizeof(dht22), PROT_WRITE, MAP_SHARED, shmid, 0)) == MAP_FAILED) {
+    if ((values = (dht22*)mmap (0, sizeof(dht22), PROT_READ|PROT_WRITE, MAP_SHARED, shmid, 0)) == MAP_FAILED) {
     	syslog(LOG_ERR, "Daemon exiting: %s(%d)", strerror(errno), errno);
     	closelog();
     	exit(-1);
@@ -89,23 +90,22 @@ int main(int argc, char *argv[])
 		exit(1);
 	}
 
-	/* Fork off the parent process */
-    pid = fork();
-    if (pid < 0) {
-    	perror("fork");
-    	return -1;
-    }
-    else {
-    	fclose(stderr);
-    	fclose(stdout);
-    	fclose(stdin);
-    	run_daemon(argv[1], atoi(argv[2]));
-    }
-    /* If we got a good PID, then
-       we can exit the parent process. */
-    if (pid > 0) {
-            exit(EXIT_SUCCESS);
-    }
+	signal(SIGCHLD, SIG_IGN);
+	signal(SIGHUP, SIG_IGN);
 
+	/* Fork off the parent process */
+	pid = fork();
+	if (pid < 0) {
+		perror("fork");
+		return -1;
+	}
+	else if (pid == 0) {
+		run_daemon(argv[1], atoi(argv[2]));
+	}
+	else {
+		fclose(stderr);
+		fclose(stdout);
+		fclose(stdin);
+	}
     return 0;
 }

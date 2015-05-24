@@ -47,10 +47,10 @@ int dht_read(char *pin, int type, float *humidity, float *temperature);
 #define DHT22 				22
 #define AM2302 				22
 
-#define DHT_MEM_SEGMENT		"dhtdaemon"
+#define DHT_MEM_SEGMENT		"/dhtdaemon"
 
 #define MUTEX_VALID			47
-#define MUTEX_INVALID 		-1
+#define MUTEX_INVALID 			-1
 
 typedef struct {
 	int mutex;
